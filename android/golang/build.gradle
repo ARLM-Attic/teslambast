@@ -1,0 +1,11 @@
+plugins {
+    id "org.golang.mobile.bind" version "0.2.6"
+}
+
+gobind {
+    pkg = "github.com/zond/teslambast/golang"
+
+		GOPATH = "/Users/zond/go"
+
+		GO = "/usr/local/go"
+}

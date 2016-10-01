@@ -22,3 +22,15 @@ _testmain.go
 *.exe
 *.test
 *.prof
+*.iml
+
+android/app/build
+android/build/generated
+android/build/intermediates
+android/.gradle
+*.swp
+gradlew
+gradlew.bat
+android/golang/golang.aar
+android/.idea
+android/gradle
