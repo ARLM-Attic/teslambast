@@ -144,6 +144,7 @@ public class MainActivity extends Activity {
                             final Vehicle vehicle = new Vehicle();
                             vehicle.name = current.getContent().getName();
                             vehicle.id = current.getContent().getID();
+                            vehicle.vehicle = current.getContent();
                             vehicleAdapter.add(vehicle);
                             new Thread(new Runnable() {
                                 public void run() {
