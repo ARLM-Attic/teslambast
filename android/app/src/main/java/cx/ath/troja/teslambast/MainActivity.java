@@ -81,6 +81,8 @@ public class MainActivity extends Activity {
     protected void displayVehicles() {
         setContentView(cx.ath.troja.teslambast.R.layout.activity_main);
 
+        ((Globals) getApplication()).vehicles.clear();
+
         final ListView vehicleList = (ListView) findViewById(cx.ath.troja.teslambast.R.id.vehicles);
         final ArrayAdapter<Vehicle> vehicleAdapter = new ArrayAdapter<Vehicle>(this, android.R.layout.simple_list_item_1, ((Globals)getApplication()).vehicles) {
             @Override
@@ -180,8 +182,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ((Globals) getApplication()).vehicles.clear();
 
         SharedPreferences prefs = getPrefs();
         if (prefs.getString("email", "").equals("") || prefs.getString("password", "").equals("")) {

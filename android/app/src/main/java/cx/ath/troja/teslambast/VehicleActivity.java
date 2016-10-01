@@ -82,27 +82,37 @@ public class VehicleActivity extends Activity {
                                     return;
                                 }
                                 if (b) {
-                                    final Button button = (Button) VehicleActivity.this.findViewById(R.id.homelink);
-                                    button.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            try {
-                                                vehicle.vehicle.activateHomelink();
-                                            } catch (final Exception e) {
-                                                handler.post(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                                    }
-                                                });
-                                                return;
-                                            }
-                                            Toast.makeText(VehicleActivity.this, R.string.homelink_activated, Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
+                                            final Button button = (Button) VehicleActivity.this.findViewById(R.id.homelink);
+                                            button.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    new Thread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            try {
+                                                                vehicle.vehicle.activateHomelink();
+                                                            } catch (final Exception e) {
+                                                                handler.post(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                                                    }
+                                                                });
+                                                                return;
+                                                            }
+                                                            handler.post(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    Toast.makeText(VehicleActivity.this, R.string.homelink_activated, Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            })
+                                                        }
+                                                    }).start();
+                                                }
+                                            });
                                             button.setEnabled(true);
                                         }
                                     });
