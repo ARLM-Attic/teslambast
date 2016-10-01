@@ -108,7 +108,7 @@ public class VehicleActivity extends Activity {
                                                                 public void run() {
                                                                     Toast.makeText(VehicleActivity.this, R.string.homelink_activated, Toast.LENGTH_SHORT).show();
                                                                 }
-                                                            })
+                                                            });
                                                         }
                                                     }).start();
                                                 }
