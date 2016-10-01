@@ -4,12 +4,9 @@ import "github.com/zond/tesla"
 
 type Connection struct {
 	client *tesla.Client
-
-	HasErr bool
-	Err    string
 }
 
-func Connect(email, password string) *Connection {
+func Connect(email, password string) (*Connection, error) {
 	client, err := tesla.NewClient(
 		&tesla.Auth{
 			ClientID:     "e4a9949fcfa04068f59abb5a658f2bac0a3428e4652315490b659d5ab3f35a9e",
@@ -17,47 +14,47 @@ func Connect(email, password string) *Connection {
 			Email:        email,
 			Password:     password,
 		})
-	result := &Connection{}
-	if err == nil {
-		result.client = client
-	} else {
-		result.HasErr = true
-		result.Err = err.Error()
+	if err != nil {
+		return nil, err
 	}
-	return result
+	return &Connection{
+		client: client,
+	}, nil
 }
 
 type Vehicle struct {
 	ID   int64
 	Name string
+
+	vehicle *tesla.Vehicle
+}
+
+func (v *Vehicle) MobileEnabled() (bool, error) {
+	return v.vehicle.MobileEnabled()
 }
 
 type Vehicles struct {
 	Content *Vehicle
-	HasErr  bool
-	Err     string
 	Next    *Vehicles
 }
 
-func (c *Connection) Vehicles() *Vehicles {
+func (c *Connection) Vehicles() (*Vehicles, error) {
 	vehicles, err := c.client.Vehicles()
 	if err != nil {
-		return &Vehicles{
-			HasErr: true,
-			Err:    err.Error(),
-		}
+		return nil, err
 	}
 	result := &Vehicles{}
 	next := result
 	for index, vehicle := range vehicles {
 		next.Content = &Vehicle{
-			ID:   vehicle.Vehicle.ID,
-			Name: vehicle.Vehicle.DisplayName,
+			ID:      vehicle.Vehicle.ID,
+			Name:    vehicle.Vehicle.DisplayName,
+			vehicle: vehicle.Vehicle,
 		}
 		if index < len(vehicles)-1 {
 			next.Next = &Vehicles{}
 			next = next.Next
 		}
 	}
-	return result
+	return result, nil
 }

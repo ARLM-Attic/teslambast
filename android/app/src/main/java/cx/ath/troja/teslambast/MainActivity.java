@@ -1,20 +1,18 @@
-/*
- * Copyright 2015 The Go Authors. All rights reserved.
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file.
- */
-
 package cx.ath.troja.teslambast;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.text.InputType;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -31,6 +29,8 @@ import static go.golang.Golang.*;
 
 
 public class MainActivity extends Activity {
+
+    private Handler handler = new Handler();
 
     protected SharedPreferences getPrefs() {
         return getSharedPreferences("teslambast", MODE_PRIVATE);
@@ -73,43 +73,106 @@ public class MainActivity extends Activity {
         builder.show();
     }
 
+    @Override
+    public void onConfigurationChanged (Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
     protected void displayVehicles() {
         setContentView(cx.ath.troja.teslambast.R.layout.activity_main);
 
-        ListView vehicleList = (ListView) findViewById(cx.ath.troja.teslambast.R.id.vehicles);
-        ArrayAdapter vehicleAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
-        vehicleList.setAdapter(vehicleAdapter);
-
-        SharedPreferences prefs = getPrefs();
-
-        Connection conn = Golang.connect(prefs.getString("email", ""), prefs.getString("password", ""));
-
-        if (conn.getHasErr()) {
-            if (conn.getErr().contains("401")) {
-                getCredentials(R.string.invalid_credentials);
-                return;
+        final ListView vehicleList = (ListView) findViewById(cx.ath.troja.teslambast.R.id.vehicles);
+        final ArrayAdapter<Vehicle> vehicleAdapter = new ArrayAdapter<Vehicle>(this, android.R.layout.simple_list_item_1, ((Globals)getApplication()).vehicles) {
+            @Override
+            public boolean isEnabled(int position) {
+                return getItem(position).mobileEnabled;
             }
-            throw new RuntimeException(conn.getErr());
-        }
+        };
+        vehicleList.setAdapter(vehicleAdapter);
+        vehicleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this, VehicleActivity.class);
+                intent.putExtra(VehicleActivity.VEHICLE_ID, vehicleAdapter.getItem(position).id);
+                startActivity(intent);
+            }
+        });
 
-        Vehicles vehicles = conn.vehicles();
+        final SharedPreferences prefs = getPrefs();
 
-        if (vehicles.getHasErr()) {
-            throw new RuntimeException(vehicles.getErr());
-        }
+        final ProgressDialog progressBar = new ProgressDialog(this);
+        progressBar.show();
 
-        while (vehicles != null && vehicles.getContent() != null) {
-            vehicleAdapter.add(vehicles.getContent().getName());
-            vehicles = vehicles.getNext();
-        }
+        new Thread(new Runnable() {
+            public void run() {
+                Connection conn;
+                try {
+                    conn = Golang.connect(prefs.getString("email", ""), prefs.getString("password", ""));
+                } catch (final Exception e) {
+                    handler.post(new Runnable() {
+                        public void run() {
+                            progressBar.dismiss();
+                             if (e.getMessage().contains("401")) {
+                                 getCredentials(R.string.invalid_credentials);
+                             } else {
+                                 Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+                             }
+                        }
+                    });
+                    return;
+                }
 
-        /*
-        mTextView = (TextView) findViewById(org.golang.example.bind.R.id.mytextview);
+                final Vehicles vehicles;
+                try {
+                    vehicles = conn.vehicles();
+                } catch (final Exception e) {
+                    handler.post(new Runnable() {
+                        public void run() {
+                            progressBar.dismiss();
+                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+                        }
+                    });
+                    return;
+                }
 
-        // Call Go function.
-        String greetings = Hello.greetings("Android and Gopher");
-        mTextView.setText(greetings);
-        */
+                handler.post(new Runnable() {
+                    public void run() {
+                        progressBar.dismiss();
+                        Vehicles next = vehicles;
+                        while (next != null && next.getContent() != null) {
+                            final Vehicles current = next;
+                            final Vehicle vehicle = new Vehicle();
+                            vehicle.name = current.getContent().getName();
+                            vehicle.id = current.getContent().getID();
+                            vehicleAdapter.add(vehicle);
+                            new Thread(new Runnable() {
+                                public void run() {
+                                    try {
+                                        vehicle.mobileEnabled = vehicles.getContent().mobileEnabled();
+                                    } catch (final Exception e) {
+                                        handler.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+                                            }
+                                        });
+                                    }
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (vehicle.mobileEnabled) {
+                                                vehicleAdapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                    });
+                                }
+                            }).start();
+                            next = next.getNext();
+                        }
+                    }
+                });
+            }
+        }).start();
     }
 
     @Override
