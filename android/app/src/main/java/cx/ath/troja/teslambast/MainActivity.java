@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
         return getSharedPreferences("teslambast", MODE_PRIVATE);
     }
 
-    protected void log(String m) {
+    public static void log(String m) {
         Log.d("teslambast", m);
     }
 
@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
                              if (e.getMessage().contains("401")) {
                                  getCredentials(R.string.invalid_credentials);
                              } else {
-                                 Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+                                 Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                              }
                         }
                     });
@@ -129,7 +129,7 @@ public class MainActivity extends Activity {
                     handler.post(new Runnable() {
                         public void run() {
                             progressBar.dismiss();
-                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });
                     return;
@@ -154,9 +154,10 @@ public class MainActivity extends Activity {
                                         handler.post(new Runnable() {
                                             @Override
                                             public void run() {
-                                                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+                                                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                                             }
                                         });
+                                        return;
                                     }
                                     handler.post(new Runnable() {
                                         @Override
@@ -179,6 +180,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ((Globals) getApplication()).vehicles.clear();
 
         SharedPreferences prefs = getPrefs();
         if (prefs.getString("email", "").equals("") || prefs.getString("password", "").equals("")) {

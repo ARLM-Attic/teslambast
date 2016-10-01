@@ -8,4 +8,6 @@
     <string name="enter_my_tesla_credentials">Please enter your MY TESLA credentials.</string>
     <string name="invalid_credentials">Invalid credentials, please try again.</string>
     <string name="invalid_vehicle">Invalid vehicle ID?</string>
+    <string name="homelink">Homelink</string>
+    <string name="homelink_activated">Homelink activated.</string>
 </resources>

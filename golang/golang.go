@@ -1,6 +1,10 @@
 package golang
 
-import "github.com/zond/tesla"
+import (
+	"fmt"
+
+	"github.com/zond/tesla"
+)
 
 type Connection struct {
 	client *tesla.Client
@@ -26,11 +30,41 @@ type Vehicle struct {
 	ID   int64
 	Name string
 
-	vehicle *tesla.Vehicle
+	vehicle   *tesla.Vehicle
+	websocket *tesla.WebSocket
 }
 
 func (v *Vehicle) MobileEnabled() (bool, error) {
 	return v.vehicle.MobileEnabled()
+}
+
+func (v *Vehicle) Connect() error {
+	sock, err := v.vehicle.WebSocket()
+	if err != nil {
+		return err
+	}
+	go func() {
+		for _ = range sock.Output {
+		}
+	}()
+	v.websocket = sock
+	return nil
+}
+
+func (v *Vehicle) ActivateHomelink() error {
+	if v.websocket == nil {
+		return fmt.Errorf("Not connected")
+	}
+	v.websocket.ActivateHomelink()
+	return nil
+}
+
+func (v *Vehicle) Close() {
+	v.websocket.Close()
+}
+
+func (v *Vehicle) HomelinkNearby() bool {
+	return v.websocket.HomelinkNearby()
 }
 
 type Vehicles struct {
