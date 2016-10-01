@@ -33,6 +33,15 @@ public class VehicleActivity extends Activity {
 
     public void onResume() {
         super.onResume();
+
+        ColorStateList colorStateList = new ColorStateList(
+                new int[][]{
+                        new int[]{android.R.attr.state_enabled}
+                },
+                new int[] { Color.RED }
+        );
+        ((RadioButton) VehicleActivity.this.findViewById(R.id.connected)).setButtonTintList(colorStateList);
+
         new Thread(new Runnable() {
             @Override
             public void run() {
