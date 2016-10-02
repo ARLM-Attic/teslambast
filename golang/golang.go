@@ -51,12 +51,33 @@ func (v *Vehicle) Connect() error {
 	return nil
 }
 
+func (v *Vehicle) AutoparkAbort() error {
+	if v.websocket == nil {
+		return fmt.Errorf("Not connected")
+	}
+	v.websocket.AutoparkAbort()
+	return nil
+}
+
+func (v *Vehicle) AutoparkReverse() error {
+	if v.websocket == nil {
+		return fmt.Errorf("Not connected")
+	}
+	return v.websocket.AutoparkReverse()
+}
+
+func (v *Vehicle) AutoparkForward() error {
+	if v.websocket == nil {
+		return fmt.Errorf("Not connected")
+	}
+	return v.websocket.AutoparkForward()
+}
+
 func (v *Vehicle) ActivateHomelink() error {
 	if v.websocket == nil {
 		return fmt.Errorf("Not connected")
 	}
-	v.websocket.ActivateHomelink()
-	return nil
+	return v.websocket.ActivateHomelink()
 }
 
 func (v *Vehicle) Close() {
@@ -65,6 +86,10 @@ func (v *Vehicle) Close() {
 
 func (v *Vehicle) HomelinkNearby() bool {
 	return v.websocket.HomelinkNearby()
+}
+
+func (v *Vehicle) AutoparkState() string {
+	return v.websocket.AutoparkState()
 }
 
 type Vehicles struct {
