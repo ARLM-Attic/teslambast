@@ -50,4 +50,22 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="@string/unlock_car"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/autoReverse"
+        android:layout_alignEnd="@+id/autoReverse"
+        android:id="@+id/unlockCar" />
+
+    <Button
+        android:text="@string/unlock_charger"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/unlockCar"
+        android:layout_alignLeft="@+id/homelink"
+        android:layout_alignStart="@+id/homelink"
+        android:id="@+id/unlockCharger" />
 </RelativeLayout>

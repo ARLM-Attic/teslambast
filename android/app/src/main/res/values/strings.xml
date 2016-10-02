@@ -10,8 +10,12 @@
     <string name="invalid_vehicle">Invalid vehicle ID?</string>
     <string name="homelink">Homelink</string>
     <string name="homelink_activated">Homelink activated.</string>
-    <string name="auto_reverse">Auto\treverse</string>
+    <string name="auto_reverse">Auto\nreverse</string>
     <string name="auto_forward">Auto\nforward</string>
+    <string name="unlock_car">Unlock\ncar</string>
+    <string name="unlock_charger">Unlock\ncharger</string>
     <string name="autoparking">Autoparking.</string>
     <string name="autopark_aborted">Autopark aborted.</string>
+    <string name="car_unlocked">Car unlocked.</string>
+    <string name="charging_port_unlocked">Charging port unlocked.</string>
 </resources>

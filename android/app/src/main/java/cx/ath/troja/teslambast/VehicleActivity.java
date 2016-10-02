@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -55,6 +56,62 @@ public class VehicleActivity extends Activity {
         super.onResume();
 
         disableControls();
+
+        ((Button) findViewById(R.id.unlockCar)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            vehicle.vehicle.unlockCar();
+                        } catch (final Exception e) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                            return;
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(VehicleActivity.this, R.string.car_unlocked, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }).start();
+            }
+        });
+
+        ((Button) findViewById(R.id.unlockCharger)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            vehicle.vehicle.unlockCharger();
+                        } catch (final Exception e) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                            return;
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(VehicleActivity.this, R.string.charging_port_unlocked, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }).start();
+            }
+        });
 
         new Thread(new Runnable() {
             @Override
@@ -208,7 +265,7 @@ public class VehicleActivity extends Activity {
                                     });
                                 }
                             }
-                        });
+                        }).start();
                         new Thread(new Runnable() {
                             @Override
                             public void run() {

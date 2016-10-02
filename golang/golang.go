@@ -84,6 +84,14 @@ func (v *Vehicle) Close() {
 	v.websocket.Close()
 }
 
+func (v *Vehicle) UnlockCar() error {
+	return v.vehicle.UnlockDoors()
+}
+
+func (v *Vehicle) UnlockCharger() error {
+	return v.vehicle.OpenChargePort()
+}
+
 func (v *Vehicle) HomelinkNearby() bool {
 	return v.websocket.HomelinkNearby()
 }
