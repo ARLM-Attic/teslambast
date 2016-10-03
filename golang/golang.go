@@ -30,16 +30,21 @@ type Vehicle struct {
 	ID   int64
 	Name string
 
-	vehicle   *tesla.Vehicle
-	websocket *tesla.WebSocket
+	vehicle    *tesla.Vehicle
+	connection *Connection
+	websocket  *tesla.WebSocket
 }
 
 func (v *Vehicle) MobileEnabled() (bool, error) {
 	return v.vehicle.MobileEnabled()
 }
 
-func (v *Vehicle) Connect() error {
-	sock, err := v.vehicle.WebSocket()
+type StateListener interface {
+	tesla.WebSocketStateListener
+}
+
+func (v *Vehicle) Connect(listener StateListener) error {
+	sock, err := v.vehicle.WebSocket(listener)
 	if err != nil {
 		return err
 	}
@@ -92,14 +97,6 @@ func (v *Vehicle) UnlockCharger() error {
 	return v.vehicle.OpenChargePort()
 }
 
-func (v *Vehicle) HomelinkNearby() bool {
-	return v.websocket.HomelinkNearby()
-}
-
-func (v *Vehicle) AutoparkState() string {
-	return v.websocket.AutoparkState()
-}
-
 type Vehicles struct {
 	Content *Vehicle
 	Next    *Vehicles
@@ -114,9 +111,10 @@ func (c *Connection) Vehicles() (*Vehicles, error) {
 	next := result
 	for index, vehicle := range vehicles {
 		next.Content = &Vehicle{
-			ID:      vehicle.Vehicle.ID,
-			Name:    vehicle.Vehicle.DisplayName,
-			vehicle: vehicle.Vehicle,
+			ID:         vehicle.Vehicle.ID,
+			Name:       vehicle.Vehicle.DisplayName,
+			vehicle:    vehicle.Vehicle,
+			connection: c,
 		}
 		if index < len(vehicles)-1 {
 			next.Next = &Vehicles{}

@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import go.golang.StateListener;
+
 public class VehicleActivity extends Activity {
 
     public static final String VEHICLE_ID = "cx.ath.troja.teslambast.VehicleActivity.VEHICLE_ID";
@@ -117,7 +119,22 @@ public class VehicleActivity extends Activity {
             @Override
             public void run() {
                 try {
-                    vehicle.vehicle.connect();
+                    vehicle.vehicle.connect(new StateListener() {
+                        @Override
+                        public void autoparkReady(boolean b) {
+
+                        }
+
+                        @Override
+                        public void connectionUp(boolean b) {
+
+                        }
+
+                        @Override
+                        public void homelinkNearby(boolean b) {
+
+                        }
+                    });
                 } catch (final Exception e) {
                     handler.post(new Runnable() {
                         @Override
@@ -136,7 +153,8 @@ public class VehicleActivity extends Activity {
                             public void run() {
                                 String state;
                                 try {
-                                    state = vehicle.vehicle.autoparkState();
+                                    // TODO:
+                                    state = "not ready";
                                 } catch (final Exception e) {
                                     handler.post(new Runnable() {
                                         @Override
@@ -271,7 +289,8 @@ public class VehicleActivity extends Activity {
                             public void run() {
                                 boolean b;
                                 try {
-                                    b = vehicle.vehicle.homelinkNearby();
+                                    // TODO:
+                                    b = false;
                                 } catch (final Exception e) {
                                     handler.post(new Runnable() {
                                         @Override
