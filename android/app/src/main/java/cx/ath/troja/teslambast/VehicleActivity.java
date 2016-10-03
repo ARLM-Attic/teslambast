@@ -59,6 +59,142 @@ public class VehicleActivity extends Activity {
 
         disableControls();
 
+        ((Button) findViewById(R.id.autoForward)).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                vehicle.vehicle.autoparkForward();
+                            } catch (final Exception e) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                                return;
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(VehicleActivity.this, R.string.autoparking, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }).start();
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                vehicle.vehicle.autoparkAbort();
+                            } catch (final Exception e) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                                return;
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(VehicleActivity.this, R.string.autopark_aborted, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }).start();
+                }
+                return true;
+            }
+        });
+
+        ((Button) findViewById(R.id.autoReverse)).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                vehicle.vehicle.autoparkReverse();
+                            } catch (final Exception e) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                                return;
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(VehicleActivity.this, R.string.autoparking, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }).start();
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                vehicle.vehicle.autoparkAbort();
+                            } catch (final Exception e) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                                return;
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(VehicleActivity.this, R.string.autopark_aborted, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }).start();
+                }
+                return true;
+            }
+        });
+
+        ((Button) findViewById(R.id.homelink)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            vehicle.vehicle.activateHomelink();
+                        } catch (final Exception e) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                            return;
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(VehicleActivity.this, R.string.homelink_activated, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }).start();
+            }
+        });
+
         ((Button) findViewById(R.id.unlockCar)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,18 +257,34 @@ public class VehicleActivity extends Activity {
                 try {
                     vehicle.vehicle.connect(new StateListener() {
                         @Override
-                        public void autoparkReady(boolean b) {
-
+                        public void autoparkReady(final boolean b) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ((Button) VehicleActivity.this.findViewById(R.id.autoForward)).setEnabled(b);
+                                    ((Button) VehicleActivity.this.findViewById(R.id.autoReverse)).setEnabled(b);
+                                }
+                            });
                         }
 
                         @Override
-                        public void connectionUp(boolean b) {
-
+                        public void connectionUp(final boolean b) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setConnectionState(b);
+                                }
+                            });
                         }
 
                         @Override
-                        public void homelinkNearby(boolean b) {
-
+                        public void homelinkNearby(final boolean b) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ((Button) VehicleActivity.this.findViewById(R.id.homelink)).setEnabled(b);
+                                }
+                            });
                         }
                     });
                 } catch (final Exception e) {
@@ -142,204 +294,7 @@ public class VehicleActivity extends Activity {
                             Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });
-                    return;
                 }
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        setConnectionState(true);
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                String state;
-                                try {
-                                    // TODO:
-                                    state = "not ready";
-                                } catch (final Exception e) {
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-                                    return;
-                                }
-                                if (state.equals("ready")) {
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Button button = (Button) VehicleActivity.this.findViewById(R.id.autoForward);
-                                            button.setOnTouchListener(new View.OnTouchListener() {
-                                                @Override
-                                                public boolean onTouch(View v, MotionEvent event) {
-                                                    if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                                                        new Thread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                try {
-                                                                    vehicle.vehicle.autoparkForward();
-                                                                } catch (final Exception e) {
-                                                                    handler.post(new Runnable() {
-                                                                        @Override
-                                                                        public void run() {
-                                                                            Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                                                        }
-                                                                    });
-                                                                    return;
-                                                                }
-                                                                handler.post(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        Toast.makeText(VehicleActivity.this, R.string.autoparking, Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                });
-                                                            }
-                                                        }).start();
-                                                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                                                        new Thread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                try {
-                                                                    vehicle.vehicle.autoparkAbort();
-                                                                } catch (final Exception e) {
-                                                                    handler.post(new Runnable() {
-                                                                        @Override
-                                                                        public void run() {
-                                                                            Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                                                        }
-                                                                    });
-                                                                    return;
-                                                                }
-                                                                handler.post(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        Toast.makeText(VehicleActivity.this, R.string.autopark_aborted, Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                });
-                                                            }
-                                                        }).start();
-                                                    }
-                                                    return true;
-                                                }
-                                            });
-                                            button.setEnabled(true);
-
-                                            button = (Button) VehicleActivity.this.findViewById(R.id.autoReverse);
-                                            button.setOnTouchListener(new View.OnTouchListener() {
-                                                @Override
-                                                public boolean onTouch(View v, MotionEvent event) {
-                                                    if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                                                        new Thread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                try {
-                                                                    vehicle.vehicle.autoparkReverse();
-                                                                } catch (final Exception e) {
-                                                                    handler.post(new Runnable() {
-                                                                        @Override
-                                                                        public void run() {
-                                                                            Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                                                        }
-                                                                    });
-                                                                    return;
-                                                                }
-                                                                handler.post(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        Toast.makeText(VehicleActivity.this, R.string.autoparking, Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                });
-                                                            }
-                                                        }).start();
-                                                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                                                        new Thread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                try {
-                                                                    vehicle.vehicle.autoparkAbort();
-                                                                } catch (final Exception e) {
-                                                                    handler.post(new Runnable() {
-                                                                        @Override
-                                                                        public void run() {
-                                                                            Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                                                        }
-                                                                    });
-                                                                    return;
-                                                                }
-                                                                handler.post(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        Toast.makeText(VehicleActivity.this, R.string.autopark_aborted, Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                });
-                                                            }
-                                                        }).start();
-                                                    }
-                                                    return true;
-                                                }
-                                            });
-                                            button.setEnabled(true);
-                                        }
-                                    });
-                                }
-                            }
-                        }).start();
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                boolean b;
-                                try {
-                                    // TODO:
-                                    b = false;
-                                } catch (final Exception e) {
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-                                    return;
-                                }
-                                if (b) {
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Button button = (Button) VehicleActivity.this.findViewById(R.id.homelink);
-                                            button.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    new Thread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                vehicle.vehicle.activateHomelink();
-                                                            } catch (final Exception e) {
-                                                                handler.post(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        Toast.makeText(VehicleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                                                    }
-                                                                });
-                                                                return;
-                                                            }
-                                                            handler.post(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    Toast.makeText(VehicleActivity.this, R.string.homelink_activated, Toast.LENGTH_SHORT).show();
-                                                                }
-                                                            });
-                                                        }
-                                                    }).start();
-                                                }
-                                            });
-                                            button.setEnabled(true);
-                                        }
-                                    });
-                                }
-                            }
-                        }).start();
-                    }
-                });
             }
         }).start();
     }
