@@ -56,6 +56,34 @@ func (v *Vehicle) Connect(listener StateListener) error {
 	return nil
 }
 
+type ClimateState struct {
+	On   bool
+	Temp float64
+}
+
+func (v *Vehicle) ClimateState() (*ClimateState, error) {
+	state, err := v.vehicle.ClimateState()
+	if err != nil {
+		return nil, err
+	}
+	return &ClimateState{
+		On:   state.IsAutoConditioningOn,
+		Temp: state.DriverTempSetting,
+	}, nil
+}
+
+func (v *Vehicle) StartAirConditioning() error {
+	return v.vehicle.StartAirConditioning()
+}
+
+func (v *Vehicle) StopAirConditioning() error {
+	return v.vehicle.StopAirConditioning()
+}
+
+func (v *Vehicle) SetTemp(temp float64) error {
+	return v.vehicle.SetTemperature(temp, temp)
+}
+
 func (v *Vehicle) AutoparkAbort() error {
 	if v.websocket == nil {
 		return fmt.Errorf("Not connected")

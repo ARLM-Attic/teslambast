@@ -17,5 +17,10 @@
     <string name="autoparking">Autoparking.</string>
     <string name="autopark_aborted">Autopark aborted.</string>
     <string name="car_unlocked">Car unlocked.</string>
+    <string name="ac">A/C</string>
+    <string name="on">On</string>
     <string name="charging_port_unlocked">Charging port unlocked.</string>
+    <string name="temp_set">Temperature set.</string>
+    <string name="ac_on">A/C on.</string>
+    <string name="ac_off">A/C off.</string>
 </resources>
